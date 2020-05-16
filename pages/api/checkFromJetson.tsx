@@ -62,19 +62,22 @@ const checkAttendance = async (roomId: number, stuId: string) => {
 			renderedDate,
 			renderedTodayHHMM
 		)
-		console.log(currentSubject)
 		if (currentSubject) {
 			const timeInterval = currentSubject[1].split('-')
 			const firstFlag = await checkStudentInList(currentSubject[0], stuId)
 			const secondFlag = renderedTodayHHMM >= timeInterval[0] && renderedTodayHHMM <= timeInterval[1]
 			if (firstFlag && secondFlag) {
 				await tickAttendance(currentSubject[0], stuId)
-				resolve({ result: 'success', message: `Goto fva.now.sh with ${code} to check` })
+				resolve({
+					result: 'success',
+					message: `Goto fva.now.sh with ${code} to check`,
+					currentSubject: currentSubject
+				})
 			} else if (!firstFlag && secondFlag) {
-				resolve({ result: 'error', message: 'You do not belong to this class' })
+				resolve({ result: 'error', message: 'You do not belong to this class', currentSubject: currentSubject })
 			}
 		}
-		resolve({ result: 'error', message: 'No class is taking place right now!' })
+		resolve({ result: 'error', message: 'No class is taking place right now!', currentSubject: currentSubject })
 	})
 }
 

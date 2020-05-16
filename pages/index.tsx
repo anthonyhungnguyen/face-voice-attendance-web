@@ -62,6 +62,7 @@ const Home = () => {
 	const handleTickAttendanceFromJetson = async () => {
 		const response = await axios.post('/api/checkFromJetson', { roomId, stuId })
 		const data = response.data
+		console.log(data)
 		swal(data.result.toUpperCase(), data.message, data.result)
 	}
 
