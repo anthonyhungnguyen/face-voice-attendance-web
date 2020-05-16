@@ -71,12 +71,17 @@ const checkAttendance = async (roomId: number, password: string, stuId: string) 
 			const firstFlag = await checkStudentInList(currentSubject[0], stuId)
 			const secondFlag = renderedTodayHHMM >= timeInterval[0] && renderedTodayHHMM <= timeInterval[1]
 			if (firstFlag && secondFlag) {
-				resolve({ result: 'success', message: `Success`, subCode: currentSubject[0] })
+				resolve({
+					result: 'success',
+					message: `Success`,
+					subCode: currentSubject[0],
+					currentSubject: currentSubject
+				})
 			} else if (!firstFlag && secondFlag) {
-				resolve({ result: 'error', message: 'You do not belong to this class' })
+				resolve({ result: 'error', message: 'You do not belong to this class', currentSubject: currentSubject })
 			}
 		}
-		resolve({ result: 'error', message: 'No class is taking place right now!' })
+		resolve({ result: 'error', message: 'No class is taking place right now!', currentSubject: currentSubject })
 	})
 }
 
