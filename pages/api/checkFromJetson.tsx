@@ -62,6 +62,7 @@ const checkAttendance = async (roomId: number, stuId: string) => {
 			renderedDate,
 			renderedTodayHHMM
 		)
+		console.log(currentSubject)
 		if (currentSubject) {
 			const timeInterval = currentSubject[1].split('-')
 			const firstFlag = await checkStudentInList(currentSubject[0], stuId)
