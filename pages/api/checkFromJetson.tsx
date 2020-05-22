@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { NextApiResponse, NextApiRequest } from 'next'
 import app from '../../utils/firebase'
-import { transferDayToRealWeekDay } from '../../utils/supplement'
+import { transferDayToRealWeekDay, getTimeNow } from '../../utils/supplement'
 
 interface deviceStat {
 	currentSubject: string[]
@@ -49,7 +49,7 @@ const checkStudentInList = async (subCode: string, stuId: string) => {
 
 const checkAttendance = async (roomId: number, stuId: string) => {
 	return new Promise(async (resolve) => {
-		const now = new Date()
+		const now = getTimeNow()
 		let renderedTodayHHMM = ''
 		if (now.getMinutes() < 10) {
 			renderedTodayHHMM = `${now.getHours()}:0${now.getMinutes()}`
@@ -81,13 +81,13 @@ const checkAttendance = async (roomId: number, stuId: string) => {
 					})
 				}
 			}
-			resolve({ result: 'error', message: 'No class is taking place right now!', currentSubject: currentSubject })
+			resolve({ result: 'error', message: 'No class is taking place right now!', renderedTodayHHMM })
 		})
 	})
 }
 
 const tickAttendance = async (subCode: string, stuId: string) => {
-	const now = new Date()
+	const now = getTimeNow()
 	const today = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}`
 	const repRef = app.firestore().collection('report').doc(today).get()
 	const studentList = (await repRef).data()

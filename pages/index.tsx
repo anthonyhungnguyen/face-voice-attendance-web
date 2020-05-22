@@ -3,6 +3,7 @@ import Head from 'next/head'
 import Router from 'next/router'
 import axios from 'axios'
 import swal from 'sweetalert'
+import ClockLoader from 'react-spinners/ClockLoader'
 
 type FormElem = React.FormEvent<HTMLFormElement>
 
@@ -16,9 +17,11 @@ const Home = () => {
 	const [ roomId, setRoomId ] = useState('')
 	const [ password, setPassword ] = useState('')
 	const [ stuId, setStuId ] = useState('')
+	const [ loading, setLoading ] = useState(false)
 
 	const handleCheckAttendance = async (e: FormElem) => {
 		e.preventDefault()
+		setLoading(true)
 		if (!roomId || !password || !stuId) {
 			swal('Error', 'Please enter all fields', 'error')
 		}
@@ -27,6 +30,7 @@ const Home = () => {
 		if (result === 'success') {
 			await handleFetchInfo(subCode).then((data: IAttendance) => {
 				if (data['recordedAt']) {
+					setLoading(false)
 					Router.push({
 						pathname: '/result',
 						query: {
@@ -37,6 +41,7 @@ const Home = () => {
 						}
 					})
 				} else {
+					setLoading(false)
 					Router.push({
 						pathname: '/result',
 						query: {
@@ -49,21 +54,9 @@ const Home = () => {
 				}
 			})
 		} else {
+			setLoading(false)
 			swal(result.toUpperCase(), message, result)
 		}
-	}
-
-	const handleCreateNewSchedule = async () => {
-		const response = await axios.post('/api/create', { id: 0 })
-		const data = response.data
-		console.log(data)
-	}
-
-	const handleTickAttendanceFromJetson = async () => {
-		const response = await axios.post('/api/checkFromJetson', { roomId, stuId })
-		const data = response.data
-		console.log(data)
-		swal(data.result.toUpperCase(), data.message, data.result)
 	}
 
 	const handleFetchInfo = async (subCode: string) => {
@@ -82,42 +75,43 @@ const Home = () => {
 				<title>FVA</title>
 				<link rel='icon' href='/favicon.ico' />
 			</Head>
-
 			<main className='w-screen h-screen bg-blue-400 flex justify-center items-center'>
-				<button onClick={handleCreateNewSchedule}>Hello</button>
-				<button onClick={handleTickAttendanceFromJetson}>Tick Attendance</button>
-				<form className='relative p-2 mt-2 w-1/4' onSubmit={handleCheckAttendance}>
-					<input
-						type='text'
-						className='w-full text-2xl py-1 bg-transparent border-b-2 border-white outline-none text-white placeholder-white'
-						placeholder='enter your room'
-						id='room'
-						value={roomId}
-						onChange={(e) => setRoomId(e.target.value)}
-					/>
-					<input
-						type='password'
-						className='w-full text-2xl py-1 bg-transparent border-b-2 border-white outline-none placeholder-white mt-5  text-white'
-						placeholder='password'
-						id='password'
-						value={password}
-						onChange={(e) => setPassword(e.target.value)}
-					/>
-					<input
-						type='text'
-						className='w-full text-2xl py-1 bg-transparent border-b-2 border-white outline-none placeholder-white mt-5 text-white'
-						placeholder='student ID'
-						id='student ID'
-						value={stuId}
-						onChange={(e) => setStuId(e.target.value)}
-					/>
-					<button
-						className='float-right py-2 px-5 border-2 border-white mt-4 uppercase font-bold text-white text-center'
-						type='submit'
-					>
-						Next
-					</button>
-				</form>
+				{loading ? (
+					<ClockLoader size={85} color={'#ffffff'} loading={loading} />
+				) : (
+					<form className='relative p-2 mt-2 w-1/4' onSubmit={handleCheckAttendance}>
+						<input
+							type='text'
+							className='w-full text-2xl py-1 bg-transparent border-b-2 border-white outline-none text-white placeholder-white'
+							placeholder='enter your room'
+							id='room'
+							value={roomId}
+							onChange={(e) => setRoomId(e.target.value)}
+						/>
+						<input
+							type='password'
+							className='w-full text-2xl py-1 bg-transparent border-b-2 border-white outline-none placeholder-white mt-5  text-white'
+							placeholder='password'
+							id='password'
+							value={password}
+							onChange={(e) => setPassword(e.target.value)}
+						/>
+						<input
+							type='text'
+							className='w-full text-2xl py-1 bg-transparent border-b-2 border-white outline-none placeholder-white mt-5 text-white'
+							placeholder='student ID'
+							id='student ID'
+							value={stuId}
+							onChange={(e) => setStuId(e.target.value)}
+						/>
+						<button
+							className='float-right py-2 px-5 border-2 border-white mt-4 uppercase font-bold text-white text-center'
+							type='submit'
+						>
+							Next
+						</button>
+					</form>
+				)}
 			</main>
 		</div>
 	)
